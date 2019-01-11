@@ -32,15 +32,18 @@ for j in $(seq 1 254); do nc -v -n -z -w 1 192.168.1.$j 22 2>> s.txt; done; grep
 for j in $(seq 1 254); do timeout 0.5 nc -v -n 192.168.1.$j 22 2>> s.txt; done; grep -v "Connection refused\|Version\|bytes\| out" s.txt | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' s.txt | sort | uniq > ips.txt;
 ```
 
-Search for open ports reading host from ips.txt
+Search for open ports in one ip or reading host from ips.txt
 ```bash
+nc -v -z -n <IP> 1-1024 #For one host
 while read host; do nc -v -z -n $host 1-1024 2>> ps.txt; done < ips.txt; cat ps.txt | grep -v "Connection refused\|Version\|bytes\| out";
 ```
 
 If you **cant select a range of ports** in your netcat version, use this oneliner to scan for ports (reading from a file)
 ```bash
+for p in $(seq 1 1024); do nc -v -z -n -w 1 <HOST> $p 2>> ps.txt; done; #For one host
 while read host; do for p in $(seq 1 1024); do nc -v -z -n -w 1 $host $p 2>> ps.txt; done; done < ips.txt; cat ps.txt | grep -v "Connection refused\|Version\|bytes\| out";
 
 #Faster scan using timeout instead of -w and -z
+for p in $(seq 1 1024); do timeout 0.5 nc -v -n <HOST> $p 2>> ps.txt; done; #For one host
 while read host; do for p in $(seq 1 1024); do timeout 0.5 nc -v -n $host $p 2>> ps.txt; done; done < ips.txt; cat ps.txt | grep -v "Connection refused\|Version\|bytes\| out";
 ```
