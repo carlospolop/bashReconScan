@@ -31,6 +31,11 @@ for j in $(seq 1 254); do nc -v -n -z -w 1 192.168.1.$j 22 2>> s.txt; done; grep
 #Faster recon using timeout instead of -w and -z
 for j in $(seq 1 254); do timeout 0.5 nc -v -n 192.168.1.$j 22 2>> s.txt; done; grep -v "Connection refused\|Version\|bytes\| out" s.txt | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' s.txt | sort | uniq > ips.txt;
 ```
+Recon /24 network using ping or timeout + ping (faster)
+```bash
+for j in $(seq 0 255); do timeout 0.7 ping 192.168.1.$j; done;
+for j in $(seq 0 255); do ping 192.168.1.$j; done;
+```
 
 Search for open ports in one ip or reading host from ips.txt
 ```bash
